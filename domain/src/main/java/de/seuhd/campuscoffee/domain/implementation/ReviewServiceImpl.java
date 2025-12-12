@@ -1,5 +1,11 @@
 package de.seuhd.campuscoffee.domain.implementation;
 
+import java.util.List;
+
+import org.jspecify.annotations.NonNull;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import de.seuhd.campuscoffee.domain.configuration.ApprovalConfiguration;
 import de.seuhd.campuscoffee.domain.model.objects.Review;
 import de.seuhd.campuscoffee.domain.ports.api.ReviewService;
@@ -8,11 +14,6 @@ import de.seuhd.campuscoffee.domain.ports.data.PosDataService;
 import de.seuhd.campuscoffee.domain.ports.data.ReviewDataService;
 import de.seuhd.campuscoffee.domain.ports.data.UserDataService;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * Implementation of the Review service that handles business logic related to review entities.
@@ -45,8 +46,7 @@ public class ReviewServiceImpl extends CrudServiceImpl<Review, Long> implements 
     @Override
     @Transactional
     public @NonNull Review upsert(@NonNull Review review) {
-        // TODO: Implement the missing business logic here
-
+        log.debug("Retrieving Review: {}", review);
         return super.upsert(review);
     }
 
@@ -62,20 +62,21 @@ public class ReviewServiceImpl extends CrudServiceImpl<Review, Long> implements 
         log.info("Processing approval request for review with ID '{}' by user with ID '{}'...",
                 review.getId(), userId);
 
-        // validate that the user exists
-        // TODO: Implement the required business logic here
+        userDataService.getById(userId);
 
-        // validate that the review exists
-        // TODO: Implement the required business logic here
+        Review persisted = reviewDataService.getById(review.getId());
 
-        // a user cannot approve their own review
-        // TODO: Implement the required business logic here
+        if (persisted.authorId().equals(userId)) {
+        throw new IllegalStateException(
+                "User cannot approve own review"
+                        .formatted(userId, persisted.id()));
+        }
 
-        // increment approval count
-        // TODO: Implement the required business logic here
-
-        // update approval status to determine if the review now reaches the approval quorum
-        // TODO: Implement the required business logic here
+        persisted = persisted.toBuilder()
+            .approvalCount(persisted.approvalCount() + 1)
+            .build();
+        
+        persisted = updateApprovalStatus(persisted);
 
         return reviewDataService.upsert(review);
     }
