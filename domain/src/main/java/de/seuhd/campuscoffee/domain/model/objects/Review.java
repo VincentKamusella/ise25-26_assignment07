@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import jakarta.annotation.Nonnull;
 import lombok.Builder;
 
 
@@ -18,6 +19,7 @@ public record Review(
         @Nullable LocalDateTime createdAt, //can be Null when a new review is created
         @Nullable LocalDateTime updatedAt, //can be Null when a new review is created
         @NonNull Long posId, 
+        @Nonnull Pos pos,
         @NonNull Long authorId, 
         @NonNull Integer approvalCount, // is updated by the domain module
         @NonNull Boolean approved // is determined by the domain module

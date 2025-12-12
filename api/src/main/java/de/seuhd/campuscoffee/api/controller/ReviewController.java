@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import org.apache.catalina.connector.Response;
+import org.yaml.snakeyaml.events.Event;
 
 import de.seuhd.campuscoffee.api.mapper.ReviewDtoMapper;
 import static de.seuhd.campuscoffee.api.openapi.Operation.*;
@@ -57,11 +58,57 @@ public class ReviewController extends CrudController<Review, ReviewDto, Long> {
     }
 
     @Operation
-    @CrudOperation(operation=getById, resource=Review)
+    @CrudOperation(operation=GET_BY_ID, resource=REVIEW)
     @GetMapping("")
     public @NonNull ResponseEntity<ReviewDto> getById(
         @Parameter(description="Unique identifier of the Review to retrieve.", required=true)
         @PathVariable Long id) {
         return super.getById(id);
+    }
+    @Operation
+    @CrudOperation(operation=CREATE, resource=REVIEW)
+    @GetMapping("")
+    public @NonNull ResponseEntity <ReviewDto> create (Dto dto) {
+        Dto created = upsert(dto);
+        return ResponseEntity
+            .created(getLocation(created.getId()))
+            .body(created);
+    }
+    @Operation
+    @CrudOperation(operation=UPDATE, resource=REVIEW)
+    @GetMapping("")
+    public @NonNull ResponseEntity <ReviewDto> update (ID id, Dto dto) {
+        if (!id.equals(dto.getId())) {
+            throw new IllegalArgumentException("ID in path and body do not match.");
+        }
+        return ResponseEntity.ok(
+                upsert(dto)
+        );
+    }
+    @Operation
+    @CrudOperation(operation=DELETE, resource=REVIEW)
+    @GetMapping("")
+    public @NonNull ResponseEntity <Void> delete (ID id) {
+    service().delete(id);
+        return ResponseEntity.noContent().build();
+    }
+    @Operation
+    @CrudOperation(operation=FILTER, resource=REVIEW)
+    @GetMapping("")
+    public @NonNull ResponseEntity <ReviewDto> filter (
+        @RequestParam("pos_id") Long posId,
+        @RequestParam("approved") boolean approved
+    ) {
+    return ResponseEntity.ok(
+                reviewDtoMapper.fromDomain(reviewService.getById(posId))
+                );
+    }
+    public ResponseEntity <ReviewDto> approve (
+    @PathVariable Long id,
+    @RequestParam("user_id") Long userId
+    ) {
+        return ResponseEntity.ok(
+            reviewDtoMapper.fromDomain(reviewService.getById(userId))
+        );
     }
 }
