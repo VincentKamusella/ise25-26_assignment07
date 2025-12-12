@@ -1,30 +1,35 @@
 package de.seuhd.campuscoffee.api.controller;
 
-import de.seuhd.campuscoffee.api.dtos.ReviewDto;
-import de.seuhd.campuscoffee.api.mapper.DtoMapper;
-import de.seuhd.campuscoffee.api.openapi.CrudOperation;
-import de.seuhd.campuscoffee.domain.model.objects.Review;
-import de.seuhd.campuscoffee.domain.ports.api.CrudService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
 
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
-
-import org.apache.catalina.connector.Response;
-import org.yaml.snakeyaml.events.Event;
-
+import de.seuhd.campuscoffee.api.dtos.ReviewDto;
+import de.seuhd.campuscoffee.api.mapper.DtoMapper;
 import de.seuhd.campuscoffee.api.mapper.ReviewDtoMapper;
-import static de.seuhd.campuscoffee.api.openapi.Operation.*;
+import de.seuhd.campuscoffee.api.openapi.CrudOperation;
+import static de.seuhd.campuscoffee.api.openapi.Operation.CREATE;
+import static de.seuhd.campuscoffee.api.openapi.Operation.DELETE;
+import static de.seuhd.campuscoffee.api.openapi.Operation.FILTER;
+import static de.seuhd.campuscoffee.api.openapi.Operation.GET_ALL;
+import static de.seuhd.campuscoffee.api.openapi.Operation.GET_BY_ID;
+import static de.seuhd.campuscoffee.api.openapi.Operation.UPDATE;
 import static de.seuhd.campuscoffee.api.openapi.Resource.REVIEW;
+import de.seuhd.campuscoffee.domain.model.objects.Review;
+import de.seuhd.campuscoffee.domain.ports.api.CrudService;
 import de.seuhd.campuscoffee.domain.ports.api.ReviewService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller for handling reviews for POS, authored by users.
@@ -68,8 +73,8 @@ public class ReviewController extends CrudController<Review, ReviewDto, Long> {
     @Operation
     @CrudOperation(operation=CREATE, resource=REVIEW)
     @GetMapping("")
-    public @NonNull ResponseEntity <ReviewDto> create (Dto dto) {
-        Dto created = upsert(dto);
+    public @NonNull ResponseEntity <ReviewDto> create (@RequestBody ReviewDto dto) {
+        ReviewDto created = upsert(dto);
         return ResponseEntity
             .created(getLocation(created.getId()))
             .body(created);
@@ -77,7 +82,9 @@ public class ReviewController extends CrudController<Review, ReviewDto, Long> {
     @Operation
     @CrudOperation(operation=UPDATE, resource=REVIEW)
     @GetMapping("")
-    public @NonNull ResponseEntity <ReviewDto> update (ID id, Dto dto) {
+    public @NonNull ResponseEntity <ReviewDto> update (
+        @PathVariable Long id, 
+        @RequestBody ReviewDto dto) {
         if (!id.equals(dto.getId())) {
             throw new IllegalArgumentException("ID in path and body do not match.");
         }
@@ -88,7 +95,7 @@ public class ReviewController extends CrudController<Review, ReviewDto, Long> {
     @Operation
     @CrudOperation(operation=DELETE, resource=REVIEW)
     @GetMapping("")
-    public @NonNull ResponseEntity <Void> delete (ID id) {
+    public @NonNull ResponseEntity <Void> delete (@PathVariable Long id) {
     service().delete(id);
         return ResponseEntity.noContent().build();
     }

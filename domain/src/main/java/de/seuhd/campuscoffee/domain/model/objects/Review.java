@@ -20,7 +20,9 @@ public record Review(
         @Nullable LocalDateTime updatedAt, //can be Null when a new review is created
         @NonNull Long posId, 
         @Nonnull Pos pos,
-        @NonNull Long authorId, 
+        @NonNull Long author, 
+        @Nonnull Long authorId,
+        @NonNull String review,
         @NonNull Integer approvalCount, // is updated by the domain module
         @NonNull Boolean approved // is determined by the domain module
 ) implements DomainModel<Long> {

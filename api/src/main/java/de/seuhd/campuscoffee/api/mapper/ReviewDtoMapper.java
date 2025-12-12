@@ -1,10 +1,14 @@
 package de.seuhd.campuscoffee.api.mapper;
 
-import de.seuhd.campuscoffee.api.dtos.ReviewDto;
-import de.seuhd.campuscoffee.domain.model.objects.Review;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 
+import de.seuhd.campuscoffee.api.dtos.ReviewDto;
+import de.seuhd.campuscoffee.domain.implementation.PosServiceImpl;
+import de.seuhd.campuscoffee.domain.implementation.UserServiceImpl;
+import de.seuhd.campuscoffee.domain.model.objects.Review;
 /**
  * MapStruct mapper for converting between the {@link Review} domain model objects and {@link ReviewDto}s.
  * .
@@ -12,13 +16,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 @Mapper(componentModel = "spring")
 @ConditionalOnMissingBean // prevent IntelliJ warning about duplicate beans
 public abstract class ReviewDtoMapper implements DtoMapper<Review, ReviewDto> {
-
+    // TODO: Uncomment this after implementing Review and ReviewDto.
     @Autowired
     @SuppressWarnings("unused") // used in @Mapping expressions
-    protected PosService posService;
+    protected PosServiceImpl posService;
     @Autowired
     @SuppressWarnings("unused") // used in @Mapping expressions
-    protected UserService userService;
+    protected UserServiceImpl userService;
 
     @Mapping(target = "posId", expression = "java(source.pos().getId())")
     @Mapping(target = "authorId", expression = "java(source.author().getId())")

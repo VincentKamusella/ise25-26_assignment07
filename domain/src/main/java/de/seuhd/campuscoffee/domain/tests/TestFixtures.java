@@ -1,17 +1,20 @@
 package de.seuhd.campuscoffee.domain.tests;
 
-import de.seuhd.campuscoffee.domain.configuration.ApprovalConfiguration;
-import de.seuhd.campuscoffee.domain.model.enums.CampusType;
-import de.seuhd.campuscoffee.domain.model.enums.PosType;
-import de.seuhd.campuscoffee.domain.model.objects.Pos;
-import de.seuhd.campuscoffee.domain.model.objects.User;
-import de.seuhd.campuscoffee.domain.ports.api.PosService;
-import de.seuhd.campuscoffee.domain.ports.api.UserService;
-import org.apache.commons.lang3.SerializationUtils;
-import de.seuhd.campuscoffee.domain.model.objects.Review;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.SerializationUtils;
+
+import de.seuhd.campuscoffee.domain.configuration.ApprovalConfiguration;
+import de.seuhd.campuscoffee.domain.implementation.ReviewServiceImpl;
+import de.seuhd.campuscoffee.domain.model.enums.CampusType;
+import de.seuhd.campuscoffee.domain.model.enums.PosType;
+import de.seuhd.campuscoffee.domain.model.objects.Pos;
+import de.seuhd.campuscoffee.domain.model.objects.Review;
+import de.seuhd.campuscoffee.domain.model.objects.User;
+import de.seuhd.campuscoffee.domain.ports.api.PosService;
+import de.seuhd.campuscoffee.domain.ports.api.UserService;
 
 /**
  * Test fixtures for domain objects.
@@ -77,7 +80,7 @@ public class TestFixtures {
             Review.builder()
                     .id(1L).createdAt(DATE_TIME).updatedAt(DATE_TIME)
                     .pos(POS_LIST.getFirst())
-                    .author(USER_LIST.getFirst())
+                    .author(USER_LIST.getFirst().getId())
                     .review("Great place!")
                     .approved(false)
                     .approvalCount(2)
@@ -85,7 +88,7 @@ public class TestFixtures {
             Review.builder()
                     .id(2L).createdAt(DATE_TIME).updatedAt(DATE_TIME)
                     .pos(POS_LIST.getFirst())
-                    .author(USER_LIST.get(1))
+                    .author(USER_LIST.get(1).getId())
                     .review("Very nice place!")
                     .approved(true)
                     .approvalCount(3)
@@ -93,7 +96,7 @@ public class TestFixtures {
             Review.builder()
                     .id(3L).createdAt(DATE_TIME).updatedAt(DATE_TIME)
                     .pos(POS_LIST.getLast())
-                    .author(USER_LIST.getLast())
+                    .author(USER_LIST.getLast().getId())
                     .review("This place is really bad!")
                     .approved(false)
                     .approvalCount(0)
@@ -148,7 +151,7 @@ public class TestFixtures {
                 .collect(Collectors.toList());
     }
 
-    public static List<Review> createReviewFixtures(ReviewService reviewService) {
+    public static List<Review> createReviewFixtures(ReviewServiceImpl reviewService) {
         return getReviewFeaturesForInsertion().stream()
                 .map(reviewService::upsert)
                 .collect(Collectors.toList());

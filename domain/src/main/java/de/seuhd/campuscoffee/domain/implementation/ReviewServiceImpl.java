@@ -66,7 +66,7 @@ public class ReviewServiceImpl extends CrudServiceImpl<Review, Long> implements 
 
         Review persisted = reviewDataService.getById(review.getId());
 
-        if (persisted.authorId().equals(userId)) {
+        if (persisted.author().equals(userId)) {
         throw new IllegalStateException(
                 "User cannot approve own review"
                         .formatted(userId, persisted.id()));
